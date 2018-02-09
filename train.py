@@ -1,9 +1,7 @@
-from skimage import color
 import scipy.misc as misc
 import tensorflow as tf
 import numpy as np
 import argparse
-import data_ops
 import random
 import ntpath
 import time
@@ -12,38 +10,42 @@ import cv2
 import os
 
 # import our own stuff
-sys.path.insert(0, '../ops/')
+sys.path.insert(0, 'ops/')
 from tf_ops import *
+from data_ops import *
+
 
 if __name__ == '__main__':
 
    parser = argparse.ArgumentParser()
-   parser.add_argument('--BATCH_SIZE', required=False,help='Batch size',type=int,default=128)
+   parser.add_argument('--BATCH_SIZE', required=False,help='Batch size',type=int,default=64)
    parser.add_argument('--DATA_DIR',   required=True,help='Directory where data is')
-   parser.add_argument('--DATASET',    required=True,help='The dataset to use')
-   parser.add_argument('--NETWORK',    required=True,help='The network to use')
+   parser.add_argument('--TRIAL',      required=True,help='Trial number', type=int)
+   parser.add_argument('--NETWORK',    required=False,help='The network to use', default='end2end')
    parser.add_argument('--EPOCHS',     required=False,help='How long to train',type=int,default=100)
    parser.add_argument('--STACK',      required=False,help='Number of frames to stack',type=int,default=4)
    a = parser.parse_args()
 
    BATCH_SIZE = a.BATCH_SIZE
    DATA_DIR   = a.DATA_DIR
-   DATASET    = a.DATASET
    NETWORK    = a.NETWORK
    EPOCHS     = a.EPOCHS
    STACK      = a.STACK
+   TRIAL      = a.TRIAL
 
-   CHECKPOINT_DIR = 'checkpoints/DATASET_'+DATASET+'/'
+   CHECKPOINT_DIR = 'checkpoints/NETWORK_'+NETWORK+'/STACK_'+str(STACK)+'/TRIAL_'+str(TRIAL)
    
-   try: os.makedirs(IMAGES_DIR)
+   try: os.makedirs(CHECKPOINT_DIR)
    except: pass
+
+   data = loadData(DATA_DIR, TRIAL)
 
    # step counter
    global_step = tf.Variable(0, name='global_step', trainable=False)
 
    # placeholders for data going into the network
    images  = tf.placeholder(tf.float32, shape=(BATCH_SIZE, 256, 256, STACK), name='images')
-   control = tf.placeholder(tf.float32, shape=(BATCH_SIZE, STACK*2, name='control')
+   control = tf.placeholder(tf.float32, shape=(BATCH_SIZE, STACK*2), name='control')
 
    if NETWORK == 'nvidiaNet':
       from nvidiaNet import nvidiaNet
