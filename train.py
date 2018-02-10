@@ -21,7 +21,7 @@ if __name__ == '__main__':
    parser.add_argument('--BATCH_SIZE', required=False,help='Batch size',type=int,default=64)
    parser.add_argument('--DATA_DIR',   required=True,help='Directory where data is')
    parser.add_argument('--TRIAL',      required=True,help='Trial number', type=int)
-   parser.add_argument('--NETWORK',    required=False,help='The network to use', default='end2end')
+   parser.add_argument('--NETWORK',    required=False,help='The network to use', default='nvidiaNet')
    parser.add_argument('--EPOCHS',     required=False,help='How long to train',type=int,default=100)
    parser.add_argument('--STACK',      required=False,help='Number of frames to stack',type=int,default=4)
    a = parser.parse_args()
@@ -45,7 +45,7 @@ if __name__ == '__main__':
 
    # placeholders for data going into the network
    images  = tf.placeholder(tf.float32, shape=(BATCH_SIZE, 256, 256, STACK), name='images')
-   control = tf.placeholder(tf.float32, shape=(BATCH_SIZE, STACK*2), name='control')
+   control = tf.placeholder(tf.float32, shape=(BATCH_SIZE, STACK*3), name='control')
 
    if NETWORK == 'nvidiaNet':
       from nvidiaNet import nvidiaNet
