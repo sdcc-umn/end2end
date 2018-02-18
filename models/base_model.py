@@ -1,11 +1,7 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """Base Model"""
-import numpy as np
-import logging
-import tensorflow as tf
 import os
-import time
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
+import logging
 
 
 class BaseModel:
