@@ -1,10 +1,14 @@
-N_CLASSES = 10
-LEARNING_RATE = 0.0005
-BATCH_SIZE = 128
-SKIP_STEP = 10
-DROPOUT = 0.75
-N_EPOCHS = 2
-N_HIDDEN_VARS= 256
+#!/usr/bin/python3
+"""CNN - LSTM regression"""
+import numpy as np
+import logging
+import tensorflow as tf
+import os
+import time
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
+
+
+class cnn_lstm_regress(BaseModel):
 
 with tf.name_scope('misc'):
     global_step = tf.Variable(0, dtype=tf.int32, trainable=False, name='global_step')
@@ -56,7 +60,7 @@ with tf.Session() as sess:
         sess.run(optimizer, {X: X_batch, Y:Y_batch})
         if (index+1) % SKIP_STEP == 0:
             merged_summary, batch_accuracy, batch_loss = sess.run([merged, tf_accuracy, tf_loss],
-                                      feed_dict={X: X_batch, Y: Y_batch})
+                                                                  feed_dict={X: X_batch, Y: Y_batch})
             writer.add_summary(merged_summary, index)
             print("{0} -- batch_accuracy={1:.5f} -- batch_loss={2:.4f}".format(index, batch_accuracy, batch_loss))
 
