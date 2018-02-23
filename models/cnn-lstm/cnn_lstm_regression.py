@@ -90,6 +90,6 @@ class CNNLSTM_R_Model(BaseModel):
         with tf.Session() as sess:
             n_batches = int(mnist.test.num_examples / BATCH_SIZE)
             X_batch, Y_batch = mnist.test.next_batch(mnist.test.num_examples)
-            total_accuracy = sess.run(self.tf_accuracy, feed_dict={X:X_batch, Y:Y_batch})
+            total_accuracy = sess.run(self.tf_accuracy, feed_dict={self.X:X_batch, self.Y:Y_batch})
 
         LOGGER.info("Total Test-Set Accuracy: {0}".format(total_accuracy))
