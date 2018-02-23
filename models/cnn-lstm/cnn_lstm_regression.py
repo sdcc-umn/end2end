@@ -2,13 +2,15 @@
 """CNN - LSTM regression"""
 import numpy as np
 import logging
-from models.base_model import BaseModel
+from base.base_model import BaseModel
 import tensorflow as tf
 import os
 import time
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 
+LOGGER = logging.getLogger("CnnLSTM")
 N_LATENT_VARS = 1024
+BATCH_SIZE = 16
 
 class CNNLSTM_R_Model(BaseModel):
     def __init__(self, config):
@@ -66,24 +68,24 @@ class CNNLSTM_R_Model(BaseModel):
 
             for index in range(initial_step, int(n_batches * N_EPOCHS)):  # train the model n_epochs times
                 X_batch, Y_batch = mnist.train.next_batch(BATCH_SIZE)
-                sess.run(optimizer, {X: X_batch, Y: Y_batch})
+                sess.run(self.optimizer, {X: X_batch, Y: Y_batch})
                 if (index + 1) % SKIP_STEP == 0:
-                    merged_summary, batch_accuracy, batch_loss = sess.run([merged, tf_accuracy, tf_loss],
+                    merged_summary, batch_accuracy, batch_loss = sess.run([merged, self.tf_accuracy, self.tf_loss],
                                                                           feed_dict={X: X_batch, Y: Y_batch})
                     writer.add_summary(merged_summary, index)
-                    print(
+                    LOGGER.info(
                         "{0} -- batch_accuracy={1:.5f} -- batch_loss={2:.4f}".format(index, batch_accuracy, batch_loss))
 
-            print("Optimization Finished!")  # should be around 0.35 after 25 epochs
-            print("Total time: {0} seconds".format(time.time() - start_time))
+            LOGGER.info("Optimization Finished!")  # should be around 0.35 after 25 epochs
+            LOGGER.info("Total time: {0} seconds".format(time.time() - start_time))
 
     def saver(self):
         self.saver = tf.train.Saver(max_to_keep=self.config.max_to_keep)
 
-
     def test(self):
-        n_batches = int(mnist.test.num_examples / BATCH_SIZE)
-        X_batch, Y_batch = mnist.test.next_batch(mnist.test.num_examples)
-        total_accuracy = sess.run(tf_accuracy, feed_dict={X:X_batch, Y:Y_batch})
+        with tf.Session() as sess:
+            n_batches = int(mnist.test.num_examples / BATCH_SIZE)
+            X_batch, Y_batch = mnist.test.next_batch(mnist.test.num_examples)
+            total_accuracy = sess.run(self.tf_accuracy, feed_dict={X:X_batch, Y:Y_batch})
 
-        print("Total Test-Set Accuracy: {0}".format(total_accuracy))
+        LOGGER.info("Total Test-Set Accuracy: {0}".format(total_accuracy))
