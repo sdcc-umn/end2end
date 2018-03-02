@@ -43,14 +43,14 @@ def batchGenerator(DATA_DIR, batch_size=32, n_stack=1, bw = False):
 
    with open(annot_file, 'r') as annot:
       # X is a stacked img array, of shape [batch_size, width, height, n_stack]
-      width = 20
-      height = 20
+      width = 128
+      height = 96
       while True:
-         X = np.ones((1, 20,20,1))
+         X = np.ones((1, height,width,1))
          Y = np.ones((1, 2))
          # Y is [batch_size, 2]
          for _ in range(batch_size):
-            sample = np.zeros((width, height, 1))
+            sample = np.zeros((height, width, 1))
 
             for _ in range(n_stack):
                # get image path from annot file
@@ -59,7 +59,7 @@ def batchGenerator(DATA_DIR, batch_size=32, n_stack=1, bw = False):
                   annot.seek(0)
                   line = annot.readline()
                assert(line!='')
-               img_path = annot.readline().split(" ")[0]
+               img_path = os.path.join(imgdir,annot.readline().split(" ")[0])
                # get image of [width, height]
                img = np.expand_dims(get_image(img_path), axis=-1)
                # stack this along the n_stack dimension
@@ -69,7 +69,7 @@ def batchGenerator(DATA_DIR, batch_size=32, n_stack=1, bw = False):
             Y = np.concatenate((Y, np.expand_dims(y, axis=0)), axis=0)
          X = X[1:]
          Y = Y[1:]
-         assert X.shape == (batch_size, width, height, n_stack), "expected {}\t got {}".format([batch_size+1, width, height, n_stack+1], X.shape)
+         assert X.shape == (batch_size, height, width, n_stack), "expected {}\t got {}".format([batch_size+1, width, height, n_stack+1], X.shape)
          assert Y.shape == (batch_size, 2), Y.shape
          yield X, Y
 
