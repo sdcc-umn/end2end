@@ -22,22 +22,25 @@ def deprocess(x):
 
 # [0,255] -> [-1, 1]
 def preprocess(x):
-   x = misc.imresize(x, 20)
-   # 96x128
-   print("shape is", np.shape(x))
+   x = misc.imresize(x, (96,128))
+   # 96x128 is %20 of the original file size
+   # print("shape is", np.shape(x))
    return (x/127.5)-1.0
 
 def get_image(img_path):
    return preprocess(io.imread(img_path, flatten=True))
 
 def get_control_tuple(line):
-   return np.array([0,0])
+   line = line.split(" ")
+   v = float(line[1])
+   a = float(line[2])
+   return np.array([a, v])
 
 def batchGenerator(DATA_DIR, batch_size=32, n_stack=1, bw = False):
    """ A genrator that returns a batch of data, parings: [Batch_Size, stack, image] """
 
    # get the path name for the annotations file, which contains (img, C) pairs.
-   annot_file = os.path.join(DATA_DIR, 'annotation.txt')
+   annot_file = os.path.join(DATA_DIR, 'annotations.txt')
    # get path for the images directory
    imgdir = os.path.join(DATA_DIR, 'images')
 
@@ -64,6 +67,8 @@ def batchGenerator(DATA_DIR, batch_size=32, n_stack=1, bw = False):
                img = np.expand_dims(get_image(img_path), axis=-1)
                # stack this along the n_stack dimension
                sample = np.concatenate((sample, img), axis=-1)
+
+               # now get the control tuple
                y = get_control_tuple(line)
             X = np.concatenate((X, np.expand_dims(sample[:, :, 1:], axis=0)), axis=0)
             Y = np.concatenate((Y, np.expand_dims(y, axis=0)), axis=0)
