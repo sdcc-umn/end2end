@@ -27,7 +27,7 @@ if __name__ == '__main__':
    # parser.add_argument('--DATA_DIR',   required=True,help='~/SDCC/data')
    parser.add_argument('--TRIAL',      required=True,help='Trial number', type=int)
    parser.add_argument('--NETWORK',    required=False,help='The network to use', default='simple_cnn')
-   parser.add_argument('--EPOCHS',     required=False,help='How long to train',type=int,default=10)
+   parser.add_argument('--EPOCHS',     required=False,help='How long to train',type=int,default=5)
    parser.add_argument('--STACK',      required=False,help='Number of frames to stack',type=int,default=4)
    a = parser.parse_args()
 
@@ -93,13 +93,12 @@ if __name__ == '__main__':
    step = sess.run(global_step)
    batch = 1
    b = batchGenerator("trial_2", n_stack=STACK, inf=False)
-   E = epochGenerator(b)
 
    for epoch_c in range(EPOCHS):
-      for res in E:
+      for res in b:
           if res == -1:
               break
-          batch_images, batch_control = res                              
+          batch_images, batch_control = res
           # run train op
           sess.run(train_op, feed_dict={images:batch_images, control:batch_control})
 
@@ -117,4 +116,7 @@ if __name__ == '__main__':
              LOGGER.info('Done saving')
 
           batch+=1
+
+   saver.save(sess, CHECKPOINT_DIR+'checkpoint-'+str(step))
+   saver.export_meta_graph(CHECKPOINT_DIR + 'checkpoint-' + str(step) + '.meta')
    sess.close()
