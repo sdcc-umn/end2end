@@ -93,12 +93,13 @@ if __name__ == '__main__':
    step = sess.run(global_step)
    batch = 1
    b = batchGenerator("trial_2", n_stack=STACK, inf=False)
+   E = epochGenerator(b)
 
    for epoch_c in range(EPOCHS):
-      E = epochGenerator(b)
-      for batch_images, batch_control in E:
-          batch_images, batch_control = next(b)
-
+      for res in E:
+          if res == -1:
+              break
+          batch_images, batch_control = res                              
           # run train op
           sess.run(train_op, feed_dict={images:batch_images, control:batch_control})
 

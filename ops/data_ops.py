@@ -84,11 +84,7 @@ def epochGenerator(b):
    #assert(str(type(b)) == "generator", "input should be a batch generator")
    print(str(type(b)))
    while True:
-       next_val = next(b)
-       if next_val == -1:
-           raise StopIteration
-       else:
-          yield next_val
+       yield next(b)
 
 
 
