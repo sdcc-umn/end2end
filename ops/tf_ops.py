@@ -5,8 +5,11 @@
 '''
 
 import tensorflow as tf
+from utils import get_logger
 import numpy as np
 import math
+
+LOGGER = get_logger(__name__)
 
 '''
    Kullback Leibler divergence
@@ -58,7 +61,7 @@ def bn(x):
 def ln(x, s, b, epsilon = 1e-5):
    m, v = tf.nn.moments(x, [1], keep_dims=True)
    normalized_input = (x - m) / tf.sqrt(v + epsilon)
-   return normalised_input * s + b
+   return normalized_input * s + b
 
 
 '''
@@ -77,17 +80,17 @@ def instance_norm(x, epsilon=1e-5):
    The new height and width can be anything, but default to the current shape * 2
 '''
 def upconv2d(x, filters, name=None, new_height=None, new_width=None, kernel_size=3):
-
-   print 'x:',x
    shapes = x.get_shape().as_list()
    height = shapes[1]
    width  = shapes[2]
+
 
    # resize image using method of nearest neighbor
    if new_height is None and new_width is None:
       x_resize = tf.image.resize_nearest_neighbor(x, [height*2, width*2])
    else:
       x_resize = tf.image.resize_nearest_neighbor(x, [new_height, new_width])
+
 
    # conv with stride 1
    return tf.layers.conv2d(x_resize, filters, kernel_size, strides=1, name=name)
@@ -113,7 +116,7 @@ def swish(x):
    Regular relu
 '''
 def relu(x):
-   return tf.nn.relu(x, name)
+   return tf.nn.relu(x)
 
 '''
    Leaky RELU
