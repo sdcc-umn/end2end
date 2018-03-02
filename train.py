@@ -92,26 +92,28 @@ if __name__ == '__main__':
    ## Begin training
    step = sess.run(global_step)
    batch = 1
-   b = batchGenerator("../trial_2", n_stack=STACK)
-   while batch//10 <= EPOCHS:
-      start = time.time()
-      batch_images, batch_control = next(b)
+   b = batchGenerator("trial_2", n_stack=STACK, inf=False)
 
-      # run train op
-      sess.run(train_op, feed_dict={images:batch_images, control:batch_control})
+   for epoch_c in range(EPOCHS):
+      E = epochGenerator(b)
+      for batch_images, batch_control in E:
+          batch_images, batch_control = next(b)
 
-      # now get all losses and summary *without* performing a training step - for tensorboard
-      loss_batch, summary = sess.run([loss, merged_summary_op], feed_dict={images:batch_images, control:batch_control})
-      summary_writer.add_summary(summary, step)
+          # run train op
+          sess.run(train_op, feed_dict={images:batch_images, control:batch_control})
 
-      print('batch_n:',batch,'step:',step,'loss:',loss_batch)
-      step += 1
-    
-      if step%500 == 0:
-         LOGGER.info('Saving model...')
-         saver.save(sess, CHECKPOINT_DIR+'checkpoint-'+str(step))
-         saver.export_meta_graph(CHECKPOINT_DIR+'checkpoint-'+str(step)+'.meta')
-         LOGGER.info('Done saving')
+          # now get all losses and summary *without* performing a training step - for tensorboard
+          loss_batch, summary = sess.run([loss, merged_summary_op], feed_dict={images:batch_images, control:batch_control})
+          summary_writer.add_summary(summary, step)
 
-      batch+=1
+          print('epoch:',epoch_c,'step:',step,'batch_loss:',loss_batch)
+          step += 1
+
+          if step%500 == 0:
+             LOGGER.info('Saving model...')
+             saver.save(sess, CHECKPOINT_DIR+'checkpoint-'+str(step))
+             saver.export_meta_graph(CHECKPOINT_DIR+'checkpoint-'+str(step)+'.meta')
+             LOGGER.info('Done saving')
+
+          batch+=1
    sess.close()

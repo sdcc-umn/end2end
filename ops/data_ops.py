@@ -36,7 +36,7 @@ def get_control_tuple(line):
    a = float(line[2])
    return np.array([a, v])
 
-def batchGenerator(DATA_DIR, batch_size=32, n_stack=1, bw = False):
+def batchGenerator(DATA_DIR, batch_size=32, n_stack=1, inf=False):
    """ A genrator that returns a batch of data, parings: [Batch_Size, stack, image] """
 
    # get the path name for the annotations file, which contains (img, C) pairs.
@@ -59,6 +59,8 @@ def batchGenerator(DATA_DIR, batch_size=32, n_stack=1, bw = False):
                # get image path from annot file
                line=annot.readline()
                if line == '':
+                  if not inf:  # will start reading again from the top of the file
+                      yield -1
                   annot.seek(0)
                   line = annot.readline()
                assert(line!='')
@@ -77,4 +79,16 @@ def batchGenerator(DATA_DIR, batch_size=32, n_stack=1, bw = False):
          assert X.shape == (batch_size, height, width, n_stack), "expected {}\t got {}".format([batch_size+1, width, height, n_stack+1], X.shape)
          assert Y.shape == (batch_size, 2), Y.shape
          yield X, Y
+
+def epochGenerator(b):
+   #assert(str(type(b)) == "generator", "input should be a batch generator")
+   print(str(type(b)))
+   while True:
+       next_val = next(b)
+       if next_val == -1:
+           raise StopIteration
+       else:
+          yield next_val
+
+
 
