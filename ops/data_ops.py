@@ -13,6 +13,8 @@ import random
 import glob
 import os
 import fnmatch
+import sys
+from skimage import io
 
 # [-1,1] -> [0, 255]
 def deprocess(x):
@@ -20,10 +22,13 @@ def deprocess(x):
 
 # [0,255] -> [-1, 1]
 def preprocess(x):
+   x = misc.imresize(x, 20)
+   # 96x128
+   print("shape is", np.shape(x))
    return (x/127.5)-1.0
 
 def get_image(img_path):
-   return np.ones((20,20))
+   return preprocess(io.imread(img_path, flatten=True))
 
 def get_control_tuple(line):
    return np.array([0,0])
