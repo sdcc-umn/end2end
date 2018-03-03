@@ -82,6 +82,7 @@ def batchGenerator(DATA_DIR, batch_size=32, n_stack=1, inf=False):
 
 def epochGenerator(b):
    #assert(str(type(b)) == "generator", "input should be a batch generator")
+   print(str(type(b)))
    while True:
        yield next(b)
 
