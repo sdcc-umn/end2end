@@ -26,18 +26,23 @@ esizing all images in --src folder and saves in --dest folder
 
 WIDTH = 224
 HEIGHT = 224
-N_CHANNELS = 3
+THRESHOLD = True
+N_CHANNELS = 1 if THRESHOLD else 3
 N_STACK = 3
 STRIDE = 3
+TEST = True
 
-
-def preprocess_img(img_path):
+def preprocess_img(img_path, threshold=THRESHOLD):
+    lower = np.array([0, 0, 0], dtype="uint8")
+    upper = np.array([100, 200, 100], dtype="uint8")
     img = cv2.imread(img_path)
     img = cv2.resize(img, (WIDTH, HEIGHT), interpolation=cv2.INTER_CUBIC)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    # mask2 = cv2.inRange(hsv, self.lower, self.upper)
-    # _, thresholded = cv2.threshold(mask2, 20, 255, 0)
-    # return thresholded
+    if threshold:
+        mask2 = cv2.inRange(img, lower, upper)
+        _, thresholded = cv2.threshold(mask2, 20, 255, 0)
+        thresholded = np.expand_dims(thresholded, axis=-1)
+        return thresholded
     return img
 
 
@@ -98,9 +103,9 @@ test_shape = (len(test), WIDTH, HEIGHT, N_CHANNELS, N_STACK)
 # Initialize/pre-allocate h5 database
 dataset_output_path = 'lane_dataset.hdf5'
 hdf5_file = h5py.File(dataset_output_path, mode='w')
-hdf5_file.create_dataset("train_img", train_shape, np.int8)
-hdf5_file.create_dataset("val_img", val_shape, np.int8)
-hdf5_file.create_dataset("test_img", test_shape, np.int8)
+hdf5_file.create_dataset("train_img", train_shape, np.uint8)
+hdf5_file.create_dataset("val_img", val_shape, np.uint8)
+hdf5_file.create_dataset("test_img", test_shape, np.uint8)
 hdf5_file.create_dataset("train_mean", train_shape, np.float32)
 hdf5_file.create_dataset("train_ctrl", (len(train),2), np.float32)
 hdf5_file.create_dataset("val_ctrl", (len(val),2), np.float32)
@@ -160,14 +165,7 @@ class ProcessImg(object):
             return False
 
     def process_all(self, src, dest):
-        dirFiles = os.listdir(src)
-        for im_file in dirFiles:
             if self.check_file_ext(im_file):
-                im = cv2.imread(src+im_file)
                 # Convert to HSV color space
                 hsv = cv2.cvtColor(im, cv2.COLOR_BGR2HSV)
                 # Create a binary thresholded image
-src_folder = '/home/irvlab/code/py_work/hough/src/'
-dst_folder = '/home/irvlab/code/py_work/hough/dest/'
-pc = ProcessImg()
-pc.process_all(src_folder, dst_folder)
