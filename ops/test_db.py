@@ -9,7 +9,7 @@ STACK=1
 
 if __name__ == "__main__":
     subtract_mean = False
-    hdf5_file = h5py.File('lane_dataset.hdf5', 'r')
+    hdf5_file = h5py.File('lane_dataset_thresholded_1stack.hdf5', 'r')
     if subtract_mean:
         mm = hdf5_file["train_mean"][0, ...]
         mm = mm[np.newaxis, ...]
@@ -32,6 +32,7 @@ if __name__ == "__main__":
         for a in range(STACK):
             fig.add_subplot(1, STACK,a+1)
             plt.imshow(images[0][:, :, 0, a])
+            plt.title("ctrl: {}".format(ctrl[0]))
         plt.show()
         if n == 10:  # break after 5 batches
             break
