@@ -5,11 +5,11 @@ from math import ceil
 import matplotlib.pyplot as plt
 
 batch_size = 32
-STACK=1
+STACK=3
 
 if __name__ == "__main__":
     subtract_mean = False
-    hdf5_file = h5py.File('lane_dataset_thresholded_1stack.hdf5', 'r')
+    hdf5_file = h5py.File('lane_dataset_thresholded_3stack.hdf5', 'r')
     if subtract_mean:
         mm = hdf5_file["train_mean"][0, ...]
         mm = mm[np.newaxis, ...]

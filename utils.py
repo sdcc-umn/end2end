@@ -3,10 +3,11 @@ import argparse
 import json
 from bunch import Bunch
 import os
+import tensorflow as tf
 
 
-class Model_Summarizer():
-    def __init__(self, sess,config):
+class ModelSummarizer():
+    def __init__(self, sess, config):
         self.sess = sess
         self.config = config
         self.summary_placeholders = {}
@@ -48,21 +49,19 @@ class Model_Summarizer():
 
 
 def get_logger(name, level=logging.DEBUG, file_level=logging.INFO):
-  logger = logging.getLogger(name)
-  logger.setLevel(level)
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+    # create a file handler
+    handler = logging.FileHandler('../log.log')
+    handler.setLevel(file_level)
+    # create a logging format
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
 
-  # create a file handler
-  handler = logging.FileHandler('../log.log')
-  handler.setLevel(file_level)
+    # add the handlers to the logger
+    logger.addHandler(handler)
 
-  # create a logging format
-  formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-  handler.setFormatter(formatter)
-
-  # add the handlers to the logger
-  logger.addHandler(handler)
-
-  return logger
+    return logger
 
 
 def get_config_from_json(json_file):
@@ -77,13 +76,15 @@ def get_config_from_json(json_file):
 
     # convert the dictionary to a namespace using bunch lib
     config = Bunch(config_dict)
+    assert config['output_shape'] is not None
+    assert config['input_shape'] is not None
     return config, config_dict
 
 
 def process_config(jsonfile):
     config, _ = get_config_from_json(jsonfile)
-    config.summary_dir = os.path.join("../experiments", config.exp_name, "summary/")
-    config.checkpoint_dir = os.path.join("../experiments", config.exp_name, "checkpoint/")
+    config.summary_dir = os.path.join("./experiments", config.exp_name, "summary/")
+    config.checkpoint_dir = os.path.join("./experiments", config.exp_name, "checkpoint/")
     return config
 
 def create_dirs(dirs):

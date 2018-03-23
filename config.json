@@ -1,0 +1,11 @@
+{
+    "input_shape": [224, 224, 1],
+    "output_shape": [2],
+    "datapath" : "lane_dataset_thresholded_1stack.hdf5",
+    "model" : "simple_cnn",
+    "exp_name" : "simple_cnn",
+    "num_epochs": 1,
+    "learning_rate": 0.001,
+    "batch_size": 16,
+    "max_to_keep":5
+}
