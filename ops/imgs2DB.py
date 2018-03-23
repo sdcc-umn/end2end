@@ -28,8 +28,8 @@ WIDTH = 224
 HEIGHT = 224
 THRESHOLD = True
 N_CHANNELS = 1 if THRESHOLD else 3
-N_STACK = 3
-STRIDE = 3
+N_STACK = 1
+STRIDE = 1
 TEST = True
 
 def preprocess_img(img_path, threshold=THRESHOLD):

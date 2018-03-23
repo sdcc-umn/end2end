@@ -5,6 +5,7 @@ from math import ceil
 import matplotlib.pyplot as plt
 
 batch_size = 32
+STACK=1
 
 if __name__ == "__main__":
     subtract_mean = False
@@ -28,8 +29,8 @@ if __name__ == "__main__":
         ctrl = hdf5_file["train_ctrl"][i_s:i_e]
         print(n+1, '/', len(batches_list))
         fig = plt.figure(figsize=(8, 8))
-        for a in range(3):
-            fig.add_subplot(1,3,a+1)
+        for a in range(STACK):
+            fig.add_subplot(1, STACK,a+1)
             plt.imshow(images[0][:, :, 0, a])
         plt.show()
         if n == 10:  # break after 5 batches
