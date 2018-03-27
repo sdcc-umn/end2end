@@ -8,4 +8,4 @@
 download the "1_stacked_images" database and put it in the root folder
 then
     
-    python main.py -C config.json
+    python main.py -c config.json
