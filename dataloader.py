@@ -17,8 +17,10 @@ class DataGenerator():
         self.config["num_iter_per_epoch"] = self.len_train
 
         batch_size = config.batch_size
-        self.n_batches = int(self.len_train/batch_size)
-        batches = list(range(self.n_batches))
+        self.n_train_batches = int(self.len_train/batch_size)
+        self.n_val_batches = int(self.len_val / batch_size)
+        self.n_test_batches = int(self.len_test / batch_size)
+        batches = list(range(self.n_train_batches))
         shuffle(batches)
         self.batches = batches
 
@@ -31,7 +33,7 @@ class DataGenerator():
             yield images, ctrl
 
     def next_val_batch(self, batch_size):
-        for n, i in enumerate(self.batches):
+        for i in range(self.n_val_batches):
             i_s = i * batch_size
             i_e = min([(i + 1) * batch_size, self.len_val])
             images = self.dataset_file["val_img"][i_s:i_e, :, :, :, 0]
@@ -39,7 +41,7 @@ class DataGenerator():
             yield images, ctrl
 
     def next_test_batch(self, batch_size):
-        for n, i in enumerate(self.batches):
+        for i in range(self.n_test_batches):
             i_s = i * batch_size
             i_e = min([(i + 1) * batch_size, self.len_test])
             images = self.dataset_file["test_img"][i_s:i_e, ..., 0]

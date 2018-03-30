@@ -1,9 +1,14 @@
 import tensorflow as tf
 import numpy as np
 from utils import get_logger
+import keras
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, Flatten
+from keras.layers import Conv2D, MaxPooling2D
+
 
 LOGGER = get_logger(__name__)
-FC_LAYER_SIZE = 1024
+FC_LAYER_SIZE = 256
 
 
 class BaseModel:
@@ -14,7 +19,7 @@ class BaseModel:
 
     def _save_model_checkpoint(self, sess):
         print("Saving model...")
-        self.saver.save(sess, self.config.checkpoint_dir, self.global_step_tensor)
+        self.saver.save(sess, self.config.checkpoint_dir, self.global_step)
         print("Model saved")
 
     def _load_model_checkpoint(self, sess):
@@ -26,6 +31,9 @@ class BaseModel:
 
     def load(self, sess):
         self._load_model_checkpoint(sess)
+
+    def save(self, sess):
+        self._save_model_checkpoint(sess)
 
     def init_cur_epoch(self):
         """inialize a tensorflow variable to use as epoch counter"""
@@ -46,15 +54,13 @@ class BaseModel:
         raise NotImplementedError
 
 
-class simple_cnn(BaseModel):
+class complex_cnn(BaseModel):
     def __init__(self, config):
         super(simple_cnn, self).__init__(config)
         self.build_model()
         self.init_saver()
 
     def build_model(self):
-        self.FC_LAYER_SIZE = 1024
-        self.is_training = tf.placeholder(tf.bool)
         self.images = tf.placeholder(tf.float32, shape=[None] + self.config.input_shape, name='images')
         self.control = tf.placeholder(tf.float32, shape=[None] + self.config.output_shape, name='control')
 
@@ -108,5 +114,55 @@ class simple_cnn(BaseModel):
             self.train_op = tf.train.AdamOptimizer(learning_rate = self.config.learning_rate).minimize(self.loss, global_step = self.global_step)
 
 
-    def predict(self, img, sess=None):
-        return sess.run(self.pred(img))
+    def predict(self, img, sess):
+        img = np.expand_dims(img, 0)
+        print(img.shape)
+        feed_dict = {self.images: img}
+        prediction = sess.run(self.pred,
+                                     feed_dict=feed_dict)
+
+        return prediction
+
+
+class simple_cnn(BaseModel):
+    def __init__(self, config):
+        super(simple_cnn, self).__init__(config)
+        self.build_model()
+        self.init_saver()
+
+    def build_model(self):
+        self.is_training = tf.placeholder(tf.bool)
+        self.images = tf.placeholder(tf.float32, shape=[None] + self.config.input_shape, name='images')
+        self.control = tf.placeholder(tf.float32, shape=[None] + self.config.output_shape, name='control')
+
+        conv1 = tf.layers.conv2d(inputs = self.images,
+                                 filters = 32,
+                                 kernel_size = [3,3],
+                                 padding = 'same',
+                                 activation = tf.nn.relu)
+        pool1 = tf.layers.max_pooling2d(inputs = conv1, pool_size = [2,2], strides =2)
+
+        conv2 = tf.layers.conv2d(inputs = pool1,
+                                 filters = 64,
+                                 kernel_size = [5,5],
+                                 padding = "same",
+                                 activation = tf.nn.relu)
+        pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=[2,2], strides=2)
+        flattened = tf.contrib.layers.flatten(pool2)
+        fc1 = tf.layers.dense(inputs=flattened, units = 256, activation=tf.nn.relu)
+        dropout1 = tf.layers.dropout(inputs = fc1, rate = 0.8, training=self.is_training)
+        fc2 = tf.layers.dense(inputs = dropout1, units = 256, activation = tf.nn.relu)
+        dropout2 = tf.layers.dropout(inputs = fc2, rate = 0.8, training=self.is_training)
+        self.pred = tf.layers.dense(inputs = dropout2, units = 2, activation = None)
+
+        self.loss = tf.losses.mean_squared_error(self.control, self.pred)
+        self.train_op= tf.train.AdamOptimizer(learning_rate = self.config.learning_rate).minimize(self.loss, global_step = self.global_step)
+
+    def predict(self, img, sess):
+        img = np.expand_dims(img, 0)
+        print(img.shape)
+        feed_dict = {self.images: img, self.is_training: False}
+        prediction = sess.run(self.pred,
+                                     feed_dict=feed_dict)
+        return prediction
+

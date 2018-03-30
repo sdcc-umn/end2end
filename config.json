@@ -3,9 +3,9 @@
     "output_shape": [2],
     "datapath" : "lane_dataset_thresholded_1stack.hdf5",
     "model" : "simple_cnn",
-    "exp_name" : "simple_cnn",
-    "num_epochs": 1,
+    "exp_name" : "simple_cnn_2",
+    "num_epochs": 2,
     "learning_rate": 0.001,
-    "batch_size": 16,
+    "batch_size": 4,
     "max_to_keep":5
 }
