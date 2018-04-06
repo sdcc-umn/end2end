@@ -1,0 +1,13 @@
+* [[https://towardsdatascience.com/learning-note-dropout-in-recurrent-networks-part-3-1b161d030cd4][dropout overview]]
+* [[https://www.tensorflow.org/programmers_guide/summaries_and_tensorboard][tensorboard page]]
+* [[https://danijar.com/structuring-your-tensorflow-models/][structuring tensorflow graphs]]
+* [[https://www.youtube.com/watch?v=oaxf3rk0KGM&t=253s][skitoptimize]]
+* [[https://web.stanford.edu/class/cs20si/2017/lectures/notes_05.pdf][managing experiments in TF]]
+* [[https://blog.metaflow.fr/tensorflow-a-proposal-of-good-practices-for-files-folders-and-models-architecture-f23171501ae3][another perspective on model architecture]]
+* Tasks
+** TODO http://kbroman.org/Tools4RR/pages/schedule.html
+   [2018-04-05 Thu]
+   [[file:~/SDCC/end2end/model.py][file:~/SDCC/end2end/model.py]]
+** TODO https://drivendata.github.io/cookiecutter-data-science/#getting-started
+   [2018-04-05 Thu]
+   [[file:~/SDCC/end2end/model.py][file:~/SDCC/end2end/model.py]]

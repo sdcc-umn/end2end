@@ -27,8 +27,8 @@ def main():
     trainer = trainers.BasicAdamTrainer(sess, model, data, config, writer)
 
    # trainer.train()
-    loss = trainer.test()
-    print("Avg loss: {}".format(loss/data.len_test))
+#    loss = trainer.test()
+#    print("Avg loss: {}".format(loss/data.len_test))
 
     fig, axs = plt.subplots(1, 5)
     for i in range(3):
@@ -38,7 +38,8 @@ def main():
         ctrl = data.dataset_file["test_ctrl"][j]
         pred = model.predict(image, sess)
         axs[i].imshow(image[:, :, 0])
-        axs[i].set_title("true: {}\npred: {:.2f}".format(ctrl, pred[0]))
+        axs[i].set_title("true: {0}\npred: {1}".format(ctrl, pred[0]))
+
     plt.show()
 
     sess.close()
